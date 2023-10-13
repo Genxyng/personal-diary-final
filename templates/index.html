@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- HTML Meta Tags -->
+    <title>Personal Diary | Lv.3</title>
+    <meta name="description"
+        content="Tempat pribadi Anda untuk mencatat perjalanan hidup, pengalaman, dan pemikiran Anda. Website kami dirancang untuk memberi Anda ruang eksklusif untuk menciptakan, mengorganisir, dan menyimpan kenangan berharga sepanjang perjalanan Anda. Dengan PersonalDiary, Anda dapat dengan mudah membuat catatan harian, mengungkapkan perasaan Anda, dan merekam momen penting dalam hidup Anda.">
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://genxyng-wishlist.glitch.me">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Wishlist">
+    <meta property="og:description"
+        content="Tempat pribadi Anda untuk mencatat perjalanan hidup, pengalaman, dan pemikiran Anda. Website kami dirancang untuk memberi Anda ruang eksklusif untuk menciptakan, mengorganisir, dan menyimpan kenangan berharga sepanjang perjalanan Anda. Dengan PersonalDiary, Anda dapat dengan mudah membuat catatan harian, mengungkapkan perasaan Anda, dan merekam momen penting dalam hidup Anda.">
+    <meta property="og:image" content="https://genxyng-wishlist.glitch.me/static/bucketlist.jpg">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="genxyng-wishlist.glitch.me">
+    <meta property="twitter:url" content="https://genxyng-wishlist.glitch.me">
+    <meta name="twitter:title" content="Wishlist">
+    <meta name="twitter:description"
+        content="Tempat di mana Anda dapat membuat dan mengelola daftar keinginan Anda dengan mudah.">
+    <meta name="twitter:image" content="https://genxyng-wishlist.glitch.me/static/bucketlist.jpg">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
+
+    <style>
+        .profile-image {
+            width: 100px;
+            /* Lebar gambar profil */
+            height: 100px;
+            /* Tinggi gambar profil */
+            overflow: hidden;
+            border-radius: 50%;
+            /* Untuk membuat gambar bulat */
+            margin-bottom: 10px
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            listing()
+            bsCustomFileInput.init()
+            alert('loaded successfully')
+        })
+
+        function listing() {
+            $.ajax({
+                type: 'GET',
+                url: '/diary',
+                data: {},
+                success: function (response) {
+                    let articles = response["articles"]
+                    for (let i = 0; i < articles.length; i++) {
+                        let title = articles[i]["title"]
+                        let content = articles[i]["content"]
+                        let file = articles[i]['file']
+
+                        let time = articles[i]['time'] || '????.??.??'
+
+                        let profile = articles[i]['profile']
+                        let temp_html =
+                            `
+                            <div class="col-4">
+                                <div class="card">
+                                    <img src="../${file}"
+                                    class="card-img-top" alt="...">
+                                        <div class="card-body">
+                                            <div class="rounded-circle profile-image">
+                                                <img src="../${profile}" class="card-img-top" alt="Profil">
+                                            </div>
+                                            <h5 class="card-title">${title}</h5>
+                                            <p class="card-text">${content}</p>
+                                            <h6 class="card-subtitle mb-2 text-muted">${time}</h6>
+                                        </div>
+                                </div>
+                            </div>
+                        `
+                        $('#cards-box').append(temp_html)
+                    }
+                }
+            })
+        }
+
+        function posting() {
+            let title = $('#image-title').val()
+            if (!title) {
+                return alert('Hey user, anda kurang ngopi. karena lupa mengisi judul')
+            }
+            let content = $('#image-description').val()
+            if (!content) {
+                return alert('Hey user, anda kurang ngopi. karena lupa mengisi deskirpsi')
+            }
+
+            let file = $('#image').prop('files')[0]
+            let profile = $('#profile').prop('files')[0]
+
+            let form_data = new FormData()
+
+            form_data.append('file_give', file)
+            form_data.append('profile_give', profile)
+            form_data.append('title_give', title)
+            form_data.append('content_give', content)
+
+            $.ajax({
+                type: 'POST',
+                url: '/diary',
+                data: form_data,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    alert(response['message'])
+                    window.location.reload()
+                }
+            })
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="p-5 mb-4 bg-light rounded-3">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold">Personal Diary</h1>
+
+                <div class="input-group mb-3" custom-file>
+                    <input type="file" class="form-control" id="image">
+                </div>
+                <div class="input-group mb-3" custom-file>
+                    <input type="file" class="form-control" id="profile">
+                </div>
+
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Image title goes here" aria-label="Image title"
+                        aria-describedby="basic-addon1" id="image-title">
+                </div>
+
+                <div class="input-group">
+                    <textarea placeholder="Type image description here" class="form-control" aria-label="With textarea"
+                        id="image-description"></textarea>
+                </div>
+
+            </div>
+            <button onclick="posting()" type="button" class="btn btn-dark">Save</button>
+        </div>
+        <div class="row justify-content-start" id="cards-box">
+
+        </div>
+    </div>
+</body>
+
+</html>
